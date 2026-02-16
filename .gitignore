@@ -1,0 +1,24 @@
+# 🔐 Archivos sensibles
+.env
+*.env
+
+# 🐍 Python
+__pycache__/
+*.pyc
+db.sqlite3
+
+# 📦 Node
+node_modules/
+dist/
+
+# 🛠 VSCode
+.vscode/
+
+# Logs
+*.log
+
+# OS
+.DS_Store
+Thumbs.db
+
+Frontend_Movil/
