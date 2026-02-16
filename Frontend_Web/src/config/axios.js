@@ -2,7 +2,7 @@
 import axios from 'axios';
 
 const instancia = axios.create({
-  baseURL: 'http://127.0.0.1:8000', // Sin /api al final
+  baseURL: import.meta.env.VITE_API_URL || 'http://127.0.0.1:8000',
   timeout: 10000,
   headers: {
     'Content-Type': 'application/json',
