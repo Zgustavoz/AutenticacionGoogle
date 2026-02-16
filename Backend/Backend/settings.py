@@ -10,7 +10,7 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/6.0/ref/settings/
 """
 # import os
-# import dj_database_url
+import dj_database_url
 from pathlib import Path
 from decouple import config
 from datetime import timedelta
@@ -25,11 +25,10 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = config('SECRET_KEY')
 
-# SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False  # <-- CAMBIAR A False EN PRODUCCIÓN
 
-ALLOWED_HOSTS = []
-
+# ALLOWED_HOSTS = ['tudominio.com', 'www.tudominio.com', 'localhost', '127.0.0.1'] # <-- DESCOMENTAR EN PRODUCCIÓN y agregar dominios
+ALLOWED_HOSTS = ['localhost', '127.0.0.1', '.onrender.com']
 
 # Application definition
 
@@ -74,19 +73,26 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'Backend.wsgi.application'
 
+# --- CONFIGURACIÓN PARA DESARROLLO LOCAL ---
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.postgresql',
+#         'NAME': config('DB_NAME'),
+#         'USER': config('DB_USER'),
+#         'PASSWORD': config('DB_PASSWORD'),
+#         'HOST': config('DB_HOST'),
+#         'PORT': config('DB_PORT'),
+#     }
+# }
 
-# Database
-# https://docs.djangoproject.com/en/6.0/ref/settings/#databases
-
+# --- CONFIGURACIÓN PARA PRODUCCIÓN ---
+# Descomenta este bloque y comenta el de arriba cuando subas a producción
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': config('DB_NAME'),
-        'USER': config('DB_USER'),
-        'PASSWORD': config('DB_PASSWORD'),
-        'HOST': config('DB_HOST'),
-        'PORT': config('DB_PORT'),
-    }
+    'default': dj_database_url.config(
+        default=config('DATABASE_URL'),
+        conn_max_age=600,
+        ssl_require=True  # Importante para Render
+    )
 }
 
 
@@ -127,6 +133,9 @@ USE_TZ = True
 STATIC_URL = 'static/'
 
 
+STATIC_ROOT = BASE_DIR / 'staticfiles'  # <-- DESCOMENTAR EN PRODUCCIÓN
+
+
 # Default authentication JWT classes for Django REST Framework
 # https://www.django-rest-framework.org/api-guide/authentication/#setting-the-authentication-scheme
 REST_FRAMEWORK = {
@@ -147,6 +156,7 @@ AUTH_USER_MODEL = 'usuarios.Usuario'
 MIDDLEWARE = [
     'corsheaders.middleware.CorsMiddleware',  # 👈 DEBE SER EL PRIMERO
     'django.middleware.security.SecurityMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',  # <-- DESCOMENTAR EN PRODUCCIÓN
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -160,6 +170,10 @@ MIDDLEWARE = [
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:5173",
     "http://127.0.0.1:5173",
+    # PRODUCCIÓN: Agrega aquí tu dominio de frontend
+    # "https://tudominio.com",
+    # "https://www.tudominio.com",
+    # "https://tufrontend.onrender.com",
 ]
 
 
@@ -177,19 +191,20 @@ CORS_ALLOW_HEADERS = [
     'x-requested-with',
 ]
 
-# Configuración de Email para pruebas
-# EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend' # en laces en la consola
+
+# --- CONFIGURACIÓN LOCAL (para pruebas) ---
+# EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 # DEFAULT_FROM_EMAIL = 'noreply@tuaplicacion.com'
 
-#Produccion
-# if not DEBUG:
+# --- CONFIGURACIÓN PRODUCCIÓN (envía emails reales) ---
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
-EMAIL_HOST_USER = config('EMAIL_HOST_USER')  # tu-email@gmail.com
-EMAIL_HOST_PASSWORD = config('EMAIL_HOST_PASSWORD')  # contraseña de aplicación
+EMAIL_HOST_USER = config('EMAIL_HOST_USER') 
+EMAIL_HOST_PASSWORD = config('EMAIL_HOST_PASSWORD')  
 DEFAULT_FROM_EMAIL = config('EMAIL_HOST_USER')
+
 
 #site id para django-allauth
 SITE_ID = 1
@@ -204,7 +219,7 @@ AUTHENTICATION_BACKENDS = [
 ACCOUNT_EMAIL_REQUIRED = True
 ACCOUNT_USERNAME_REQUIRED = True
 ACCOUNT_AUTHENTICATION_METHOD = 'username_email'
-ACCOUNT_EMAIL_VERIFICATION = 'none'  # Cambiar a 'mandatory' en producción
+ACCOUNT_EMAIL_VERIFICATION = 'mandatory'  # <-- CAMBIAR A 'mandatory' EN PRODUCCIÓN y 'none' para local 
 
 # Configuración de Google OAuth
 SOCIALACCOUNT_PROVIDERS = {
@@ -224,27 +239,28 @@ SOCIALACCOUNT_PROVIDERS = {
     }
 }
 
-# Redirección después de login social => para local
-LOGIN_REDIRECT_URL = 'http://localhost:5173/cliente'
-ACCOUNT_LOGOUT_REDIRECT_URL = 'http://localhost:5173/login'
+# --- LOCAL ---
+# LOGIN_REDIRECT_URL = 'http://localhost:5173/cliente'
+# ACCOUNT_LOGOUT_REDIRECT_URL = 'http://localhost:5173/login'
 
-#Para Produccion
-# FRONTEND_URL = config('FRONTEND_URL', default='http://localhost:5173')
+# --- PRODUCCIÓN ---
+# Descomenta esto y comenta las URLs de localhost arriba
+FRONTEND_URL = config('FRONTEND_URL', default='https://tudominio.com')
+LOGIN_REDIRECT_URL = f'{FRONTEND_URL}/cliente'
+ACCOUNT_LOGOUT_REDIRECT_URL = f'{FRONTEND_URL}/login'
 
-# LOGIN_REDIRECT_URL = f'{FRONTEND_URL}/cliente'
-# ACCOUNT_LOGOUT_REDIRECT_URL = f'{FRONTEND_URL}/login'
 
-# Configuración de tiempo de expiración para tokens de restablecimiento de contraseña
-# PASSWORD_RESET_TIMEOUT = 86400 
-
-# Configuración de producción
-# DEBUG = config('DEBUG', default=False, cast=bool)
-# ALLOWED_HOSTS = config('ALLOWED_HOSTS', default='localhost,127.0.0.1').split(',')
-
-# CORS_ALLOWED_ORIGINS = config('CORS_ALLOWED_ORIGINS', default='http://localhost:5173,http://127.0.0.1:5173').split(',')
-
-# if not DEBUG:
-#     DATABASES['default'] = dj_database_url.config(
-#         default=config('DATABASE_URL'),
-#         conn_max_age=600
-#     )
+# =====================================================
+# LISTA DE VERIFICACIÓN PARA PRODUCCIÓN
+# ===================================================== 
+# 1. DEBUG = False
+# 2. ALLOWED_HOSTS con tus dominios
+# 3. Comentar DATABASES local y descomentar DATABASES producción
+# 4. Descomentar STATIC_ROOT y whitenoise
+# 5. Agregar dominios de producción en CORS_ALLOWED_ORIGINS
+# 6. Cambiar EMAIL_BACKEND a SMTP real
+# 7. ACCOUNT_EMAIL_VERIFICATION = 'mandatory'
+# 8. Cambiar LOGIN_REDIRECT_URL a FRONTEND_URL
+# 9. Verificar que todas las variables de entorno están en producción
+# 10. Ejecutar: python manage.py collectstatic
+# 11. Ejecutar: python manage.py migrate

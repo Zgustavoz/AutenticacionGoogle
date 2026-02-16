@@ -1,11 +1,21 @@
 # 🔐 Archivos sensibles
+.venv/
+env/
+venv/
+
+# Archivos de entorno
 .env
-*.env
+.env.local
+.env.production
 
 # 🐍 Python
 __pycache__/
 *.pyc
 db.sqlite3
+
+# Base de datos
+*.sqlite3
+*.db
 
 # 📦 Node
 node_modules/
@@ -20,5 +30,9 @@ dist/
 # OS
 .DS_Store
 Thumbs.db
+
+# Archivos estáticos
+staticfiles/
+static/
 
 Frontend_Movil/
