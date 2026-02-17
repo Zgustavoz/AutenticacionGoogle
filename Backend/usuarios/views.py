@@ -14,6 +14,7 @@ from google.oauth2 import id_token
 from google.auth.transport import requests as google_requests
 from .models import Usuario, Rol
 from decouple import config
+import threading
 from .serializers import (
     CustomTokenObtainPairSerializer,
     UsuarioSerializer,
@@ -91,10 +92,6 @@ class RestablecerPasswordView(APIView):
 
 
 class PasswordResetView(APIView):
-    """
-    Vista para solicitar recuperación de contraseña (envía email)
-    Endpoint: /api/password-reset/
-    """
     permission_classes = [AllowAny]
     
     def post(self, request):
@@ -103,32 +100,43 @@ class PasswordResetView(APIView):
         if not email:
             return Response({'error': 'El email es requerido'}, status=400)
         
+        def send_reset_email(user, email):
+            """Función para enviar email en segundo plano"""
+            try:
+                token = default_token_generator.make_token(user)
+                uid = urlsafe_base64_encode(force_bytes(user.pk))
+                
+                reset_url = f"{config('FRONTEND_URL')}/reset-password/{uid}/{token}/"
+                
+                print(f"🔗 Enlace generado: {reset_url}")
+                
+                send_mail(
+                    'Recuperación de Contraseña',
+                    f"""
+                    Hola {user.first_name or user.username},
+                    
+                    Haz clic en el siguiente enlace para restablecer tu contraseña:
+                    {reset_url}
+                    
+                    Si no solicitaste esto, ignora el mensaje.
+                    """,
+                    config('EMAIL_HOST_USER'),
+                    [email],
+                    fail_silently=True,  # Cambiado a True para no bloquear
+                )
+                print(f"✅ Email enviado a {email}")
+            except Exception as e:
+                print(f"❌ Error enviando email: {e}")
+        
         try:
             user = Usuario.objects.get(email=email)
             
-            token = default_token_generator.make_token(user)
-            uid = urlsafe_base64_encode(force_bytes(user.pk))
+            # Enviar email en un hilo separado
+            email_thread = threading.Thread(target=send_reset_email, args=(user, email))
+            email_thread.daemon = True  # El hilo se cierra cuando termine el proceso principal
+            email_thread.start()
             
-            # reset_url = f"http://localhost:5173/reset-password/{uid}/{token}"
-            reset_url = f"{config('FRONTEND_URL')}/reset-password/{uid}/{token}"
-            
-            print(f"🔗 Enlace generado: {reset_url}")
-            
-            send_mail(
-                'Recuperación de Contraseña',
-                f"""
-                Hola {user.first_name or user.username},
-                
-                Haz clic en el siguiente enlace para restablecer tu contraseña:
-                {reset_url}
-                
-                Si no solicitaste esto, ignora el mensaje.
-                """,
-                settings.DEFAULT_FROM_EMAIL,
-                [email],
-                fail_silently=False,
-            )
-            
+            # Responder inmediatamente
             return Response({'message': 'Email enviado'}, status=200)
             
         except Usuario.DoesNotExist:

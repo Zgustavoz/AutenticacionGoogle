@@ -205,6 +205,11 @@ EMAIL_HOST_USER = config('EMAIL_HOST_USER')
 EMAIL_HOST_PASSWORD = config('EMAIL_HOST_PASSWORD')  
 DEFAULT_FROM_EMAIL = config('EMAIL_HOST_USER')
 
+#timeout para el envío de emails
+EMAIL_TIMEOUT = 10  # segundos
+
+# Usar conexión persistente (ahorra recursos)
+EMAIL_USE_LOCALTIME = True
 
 #site id para django-allauth
 SITE_ID = 1
