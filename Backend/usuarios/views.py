@@ -109,7 +109,7 @@ class PasswordResetView(APIView):
             uid = urlsafe_base64_encode(force_bytes(user.pk))
             
             # reset_url = f"http://localhost:5173/reset-password/{uid}/{token}"
-            reset_url = f"{settings.FRONTEND_URL}/reset-password/{uid}/{token}"
+            reset_url = f"https://autenticacion-google-eight.vercel.app/reset-password/{uid}/{token}"
             
             print(f"🔗 Enlace generado: {reset_url}")
             
