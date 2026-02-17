@@ -13,6 +13,7 @@ from rest_framework_simplejwt.tokens import RefreshToken
 from google.oauth2 import id_token
 from google.auth.transport import requests as google_requests
 from .models import Usuario, Rol
+from decouple import config
 from .serializers import (
     CustomTokenObtainPairSerializer,
     UsuarioSerializer,
@@ -109,7 +110,7 @@ class PasswordResetView(APIView):
             uid = urlsafe_base64_encode(force_bytes(user.pk))
             
             # reset_url = f"http://localhost:5173/reset-password/{uid}/{token}"
-            reset_url = f"https://autenticacion-google-eight.vercel.app/reset-password/{uid}/{token}"
+            reset_url = f"{config('FRONTEND_URL')}/reset-password/{uid}/{token}"
             
             print(f"🔗 Enlace generado: {reset_url}")
             
