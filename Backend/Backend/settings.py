@@ -172,10 +172,8 @@ MIDDLEWARE = [
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:5173",
     "http://127.0.0.1:5173",
-    # PRODUCCIÓN: Agrega aquí tu dominio de frontend
-    # "https://tudominio.com",
-    # "https://www.tudominio.com",
-    # "https://tufrontend.onrender.com",
+    config('FRONTEND_URL'),  # <-- DESCOMENTAR EN PRODUCCIÓN
+    # "https://www.autenticacion-google-eight.vercel.app",
 ]
 
 
