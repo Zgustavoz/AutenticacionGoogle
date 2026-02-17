@@ -245,7 +245,7 @@ SOCIALACCOUNT_PROVIDERS = {
 
 # --- PRODUCCIÓN ---
 # Descomenta esto y comenta las URLs de localhost arriba
-FRONTEND_URL = config('FRONTEND_URL', default='https://tudominio.com')
+FRONTEND_URL = config('FRONTEND_URL', default='https://autenticacion-google-eight.vercel.app')
 LOGIN_REDIRECT_URL = f'{FRONTEND_URL}/cliente'
 ACCOUNT_LOGOUT_REDIRECT_URL = f'{FRONTEND_URL}/login'
 
