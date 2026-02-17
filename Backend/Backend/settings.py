@@ -30,7 +30,7 @@ SECRET_KEY = config('SECRET_KEY')
 DEBUG = False  # <-- CAMBIAR A False EN PRODUCCIÓN
 
 # ALLOWED_HOSTS = ['tudominio.com', 'www.tudominio.com', 'localhost', '127.0.0.1'] # <-- DESCOMENTAR EN PRODUCCIÓN y agregar dominios
-ALLOWED_HOSTS = ['localhost', '127.0.0.1', '.onrender.com']
+ALLOWED_HOSTS = ['localhost', '127.0.0.1', '.onrender.com', '.railway.app']  # 👈 agrega .railway.app
 
 # Application definition
 
