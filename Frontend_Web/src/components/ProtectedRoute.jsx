@@ -1,3 +1,4 @@
+// src/components/ProtectedRoute.jsx
 import { Navigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import Unauthorized from './../Auth/pages/Unauthorized';
@@ -15,7 +16,7 @@ function ProtectedRoute({ children, requireAdmin = false }) {
 
   // 🔐 No autenticado
   if (!user) {
-    return <Navigate to="/Unauthorized" replace />;
+    return <Navigate to="/unauthorized" replace />;
   }
 
   // 🚫 Autenticado pero sin permisos

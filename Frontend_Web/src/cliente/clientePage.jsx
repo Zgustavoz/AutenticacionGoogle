@@ -1,7 +1,16 @@
+// src/cliente/clientePage.jsx
 import { useAuth } from '../context/AuthContext';
+import { useNavigate } from 'react-router-dom'; 
 
 function ClienteDashboard() {
   const { user, logout } = useAuth();
+  const navigate = useNavigate(); 
+
+  const handleLogout = async () => {
+    await logout();
+    navigate('/login');
+  };
+
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-green-500 to-teal-600">
@@ -18,7 +27,7 @@ function ClienteDashboard() {
                 👤 {user?.username} ({user?.rol})
               </span>
               <button
-                onClick={logout}
+                onClick={handleLogout}
                 className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg transition"
               >
                 Cerrar Sesión
