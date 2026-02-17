@@ -1,14 +1,31 @@
 // src/Auth/pages/Login.jsx
 import { Eye, EyeOff } from "lucide-react";
-import { useState } from "react";
+import { useRef, useState, useEffect } from "react";
 import { useForm } from "@tanstack/react-form";
 import { Link } from "react-router-dom";
 import { useAuth } from "../hooks/useAuth";
 import { LoginGoogle } from "../components/LoginGoogle";
 
+
+
 export const LoginPage = () => {
   const { login, googleLogin } = useAuth();
   const [showPassword, setShowPassword] = useState(false);
+
+  const containerRef = useRef(null);
+  const [buttonWidth, setButtonWidth] = useState(400);
+
+  useEffect(() => {
+    const updateWidth = () => {
+      if (containerRef.current) {
+        setButtonWidth(containerRef.current.offsetWidth);
+      }
+    };
+
+    updateWidth();
+    window.addEventListener('resize', updateWidth);
+    return () => window.removeEventListener('resize', updateWidth);
+  }, []);
 
   const form = useForm({
     defaultValues: {
@@ -128,8 +145,8 @@ export const LoginPage = () => {
           </div>
 
           {/* SOCIALS */}
-          <div className="flex justify-center gap-4">
-            <LoginGoogle onSuccess={handleGoogleSuccess} />
+          <div className="w-full" ref={containerRef}>
+            <LoginGoogle onSuccess={handleGoogleSuccess} width={buttonWidth} />
           </div>
 
           {/* SIGN UP */}

@@ -14,7 +14,8 @@ from google.oauth2 import id_token
 from google.auth.transport import requests as google_requests
 from .models import Usuario, Rol
 from decouple import config
-from django.core.mail import get_connection
+# from django.core.mail import get_connection
+import traceback
 import threading
 from .serializers import (
     CustomTokenObtainPairSerializer,
@@ -97,29 +98,16 @@ class PasswordResetView(APIView):
     
     def post(self, request):
         email = request.data.get('email')
-        print(f"📩 Request recibido para email: {email}")
         
         if not email:
-            print("❌ No se proporcionó email")
             return Response({'error': 'El email es requerido'}, status=400)
         
-        def send_reset_email(user, email):  # 👈 DEBE estar DENTRO de post()
+        def send_reset_email(user, email):
             try:
-                print(f"🧵 Hilo iniciado para: {email}")
                 
                 token = default_token_generator.make_token(user)
                 uid = urlsafe_base64_encode(force_bytes(user.pk))
                 reset_url = f"{config('FRONTEND_URL')}/reset-password/{uid}/{token}/"
-                
-                print(f"🔗 Enlace generado: {reset_url}")
-                print(f"📤 Desde: {config('EMAIL_HOST_USER')}")
-                print(f"🔧 HOST: {settings.EMAIL_HOST}:{settings.EMAIL_PORT}")
-                
-                # Probar conexión primero
-                connection = get_connection()
-                connection.open()
-                print(f"✅ Conexión SMTP abierta correctamente")
-                connection.close()
                 
                 result = send_mail(
                     'Recuperación de Contraseña',
@@ -128,37 +116,23 @@ class PasswordResetView(APIView):
                     [email],
                     fail_silently=False,
                 )
-                print(f"📨 Resultado send_mail: {result}")  # 1 = éxito, 0 = falló
                 
-                if result == 1:
-                    print(f"✅ Email enviado exitosamente a {email}")
-                else:
-                    print(f"⚠️ send_mail retornó 0, email NO enviado a {email}")
-                    
             except Exception as e:
-                print(f"❌ Error tipo: {type(e).__name__}")
-                print(f"❌ Error detalle: {str(e)}")
-                import traceback
                 traceback.print_exc()
         
         try:
-            print(f"🔍 Buscando usuario con email: {email}")
             user = Usuario.objects.get(email=email)
-            print(f"👤 Usuario encontrado: {user.username}")
             
             email_thread = threading.Thread(target=send_reset_email, args=(user, email))
             email_thread.daemon = False
-            email_thread.start()
-            print(f"🧵 Hilo lanzado correctamente")
-            
+            email_thread.start()        
             return Response({'message': 'Email enviado'}, status=200)
             
         except Usuario.DoesNotExist:
-            print(f"⚠️ No existe usuario con email: {email} (respuesta genérica enviada)")
             return Response({'message': 'Email enviado'}, status=200)
         
         except Exception as e:
-            print(f"❌ Error inesperado en post(): {type(e).__name__}: {str(e)}")
+            traceback.print_exc()
             return Response({'error': 'Error interno'}, status=500)
 
 class GoogleLoginView(APIView):
