@@ -122,7 +122,7 @@ class PasswordResetView(APIView):
                     """,
                     config('EMAIL_HOST_USER'),
                     [email],
-                    fail_silently=True,  # Cambiado a True para no bloquear
+                    fail_silently=False,  # Cambiado a True para no bloquear
                 )
                 print(f"✅ Email enviado a {email}")
             except Exception as e:
@@ -133,7 +133,7 @@ class PasswordResetView(APIView):
             
             # Enviar email en un hilo separado
             email_thread = threading.Thread(target=send_reset_email, args=(user, email))
-            email_thread.daemon = True  # El hilo se cierra cuando termine el proceso principal
+            email_thread.daemon = False  # El hilo se cierra cuando termine el proceso principal
             email_thread.start()
             
             # Responder inmediatamente
