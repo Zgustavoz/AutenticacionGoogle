@@ -82,7 +82,6 @@ function RestablecerPassword() {
       },
       {
         onSuccess: () => {
-          toast.success('¡Contraseña actualizada!');
           setTimeout(() => navigate('/login'), 2000);
         },
         onError: (error) => {

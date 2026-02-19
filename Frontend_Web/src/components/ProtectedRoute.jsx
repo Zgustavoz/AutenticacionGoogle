@@ -4,15 +4,7 @@ import { useAuth } from '../context/AuthContext';
 import Unauthorized from './../Auth/pages/Unauthorized';
 
 function ProtectedRoute({ children, requireAdmin = false }) {
-  const { user, loading } = useAuth();
-
-  if (loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-purple-600 to-blue-500">
-        <div className="text-white text-2xl">Cargando...</div>
-      </div>
-    );
-  }
+  const { user } = useAuth();
 
   // 🔐 No autenticado
   if (!user) {

@@ -29,11 +29,16 @@ SECRET_KEY = config('SECRET_KEY')
 
 DEBUG = False  # <-- CAMBIAR A False EN PRODUCCIÓN
 
-# ALLOWED_HOSTS = ['tudominio.com', 'www.tudominio.com', 'localhost', '127.0.0.1'] # <-- DESCOMENTAR EN PRODUCCIÓN y agregar dominios
-ALLOWED_HOSTS = ['localhost', '127.0.0.1', '.onrender.com', '.railway.app']  # 👈 agrega .railway.app
+# validar host y dominios permitidos
+ALLOWED_HOSTS = ['localhost', '127.0.0.1', '0.0.0.0', '.onrender.com', '.railway.app']  
+
+# Configuración de CSRF para producción
+CSRF_TRUSTED_ORIGINS = [
+    'https://*.railway.app',
+    config('FRONTEND_URL'),
+]
 
 # Application definition
-
 INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
@@ -170,10 +175,11 @@ MIDDLEWARE = [
 
 #permisos para el frontend
 CORS_ALLOWED_ORIGINS = [
+    "http://localhost",
+    "http://127.0.0.1",
     "http://localhost:5173",
     "http://127.0.0.1:5173",
-    "https://autenticacion-google-eight.vercel.app",  # <-- DESCOMENTAR EN PRODUCCIÓN
-    # "https://www.autenticacion-google-eight.vercel.app",
+    config('FRONTEND_URL'),
 ]
 
 
@@ -217,7 +223,7 @@ SITE_ID = 1
 #configuración de allauth
 AUTHENTICATION_BACKENDS = [
     'django.contrib.auth.backends.ModelBackend',
-    'allauth.account.auth_backends.AuthenticationBackend',  # 👈 NUEVO
+    'allauth.account.auth_backends.AuthenticationBackend',
 ]
 
 #Configuración de allauth
@@ -250,7 +256,7 @@ SOCIALACCOUNT_PROVIDERS = {
 
 # --- PRODUCCIÓN ---
 # Descomenta esto y comenta las URLs de localhost arriba
-FRONTEND_URL = config('FRONTEND_URL', default='https://autenticacion-google-eight.vercel.app')
+FRONTEND_URL = config('FRONTEND_URL')
 LOGIN_REDIRECT_URL = f'{FRONTEND_URL}/cliente'
 ACCOUNT_LOGOUT_REDIRECT_URL = f'{FRONTEND_URL}/login'
 

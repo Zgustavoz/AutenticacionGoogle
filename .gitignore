@@ -1,4 +1,4 @@
-# 🔐 Archivos sensibles
+# 🔐 Archivos sensibles //.gitignore
 .venv/
 env/
 venv/
@@ -7,6 +7,7 @@ venv/
 .env
 .env.local
 .env.production
+.env.docker
 
 # 🐍 Python
 __pycache__/
@@ -36,3 +37,12 @@ staticfiles/
 static/
 
 Frontend_Movil/
+
+# Docker
+*.pid
+.dockerignore
+
+# Evitar archivos basura del sistema
+*.swp
+*.swo
+*~

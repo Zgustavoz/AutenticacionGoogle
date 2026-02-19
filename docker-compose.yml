@@ -1,0 +1,45 @@
+services:
+  backend:
+    build: ./Backend
+    image: zgus/backend-login:latest
+    container_name: backend_prod
+    restart: always
+    ports:
+      - "8000:8000"
+    env_file:
+      - ./Backend/.env  # Usa tu archivo unificado
+    command: >
+      sh -c "python manage.py migrate &&
+             gunicorn Backend.wsgi:application --bind 0.0.0.0:8000"
+    networks:
+      - app_network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health/"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  frontend:
+    build: ./Frontend_Web
+    image: zgus/frontend-login:latest
+    container_name: frontend_prod
+    restart: always
+    ports:
+      - "80:80"  # Puerto 80 para producción
+    depends_on:
+      backend:
+        condition: service_healthy
+    env_file:
+      - ./Frontend_Web/.env  # Usa tu archivo unificado
+    networks:
+      - app_network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost/"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+networks:
+  app_network:
+    driver: bridge

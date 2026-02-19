@@ -2,6 +2,7 @@
 from django.contrib import admin
 from django.urls import path, include
 from rest_framework_simplejwt.views import TokenRefreshView
+from django.http import HttpResponse
 from usuarios.views import (
     CustomTokenObtainPairView,
     RegistroView,
@@ -10,6 +11,9 @@ from usuarios.views import (
     PasswordResetView,
     GoogleLoginView,
 )
+
+def health(request):
+    return HttpResponse("OK")
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -29,4 +33,7 @@ urlpatterns = [
     # Google OAuth
     path('api/auth/google/', GoogleLoginView.as_view(), name='google_login'),
     path('accounts/', include('allauth.urls')),
+
+    # Ruta de salud
+    path('health/', health, name='health'),
 ]
