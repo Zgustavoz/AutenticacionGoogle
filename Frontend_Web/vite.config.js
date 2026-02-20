@@ -8,16 +8,16 @@ export default defineConfig({
     react(),
     tailwindcss(),
   ],
-  server: {
-    host: true,           
-    port: 5173,
-    strictPort: true,     
-    watch: {
-      usePolling: true  
-    },
-    headers: {
-      "Cross-Origin-Opener-Policy": "same-origin-allow-popups",
-      "Cross-Origin-Embedder-Policy": "unsafe-none",
-    },
-  },
+  // server: {
+  //   host: true,           
+  //   port: 5173,
+  //   strictPort: true,     
+  //   watch: {
+  //     usePolling: true  
+  //   },
+  //   headers: {
+  //     "Cross-Origin-Opener-Policy": "same-origin-allow-popups",
+  //     "Cross-Origin-Embedder-Policy": "unsafe-none",
+  //   },
+  // },
 })
