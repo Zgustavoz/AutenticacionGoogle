@@ -44,7 +44,7 @@
                 <category android:name="android.intent.category.BROWSABLE" />
                 <data
                     android:scheme="https"
-                    android:host="tudominio.com"
+                    android:host="autenticacion-google-eight.vercel.app"
                     android:pathPrefix="/restablecer-password" />
             </intent-filter>
 
@@ -54,8 +54,8 @@
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
                 <data
-                    android:scheme="http"
-                    android:host="tudominio.com"
+                    android:scheme="https"
+                    android:host="autenticacion-google-eight.vercel.app"
                     android:pathPrefix="/restablecer-password" />
             </intent-filter>
             <!-- ================================================= -->
