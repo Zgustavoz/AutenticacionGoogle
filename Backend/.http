@@ -4,7 +4,7 @@ Content-Type: application/json
 
 {
   "username": "cliente1",
-  "password": "Cliente67850269#",
+  "password": "12345678#",
   "email": ""
 }
 
@@ -40,7 +40,3 @@ Content-Type: application/json
 
 ###
 GET http://127.0.0.1:8000/api/password-reset/
-
-
-from django.contrib.auth import get_user_model
-User = get_user_model()

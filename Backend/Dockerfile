@@ -6,7 +6,7 @@ ENV PYTHONUNBUFFERED=1
 ENV PORT=8000
 
 WORKDIR /app
-
+ 
 # Copia el archivo de dependencias primero (para aprovechar caché de Docker)
 COPY requirements.txt .
 

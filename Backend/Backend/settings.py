@@ -30,7 +30,7 @@ SECRET_KEY = config('SECRET_KEY')
 DEBUG = False  # <-- CAMBIAR A False EN PRODUCCIÓN
 
 # validar host y dominios permitidos
-ALLOWED_HOSTS = ['localhost', '127.0.0.1', '0.0.0.0', '.onrender.com', '.railway.app']  
+ALLOWED_HOSTS = ['localhost', '127.0.0.1', '0.0.0.0', '.onrender.com', '.railway.app','192.168.0.18']  
 
 # Configuración de CSRF para producción
 CSRF_TRUSTED_ORIGINS = [
