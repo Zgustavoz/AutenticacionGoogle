@@ -22,15 +22,13 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/6.0/howto/deployment/checklist/
 
-PORT = os.environ.get('PORT', 10000)
-
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = config('SECRET_KEY')
 
 DEBUG = False  # <-- CAMBIAR A False EN PRODUCCIÓN
 
 # validar host y dominios permitidos
-ALLOWED_HOSTS = ['localhost', '127.0.0.1', '0.0.0.0', '.onrender.com', '.railway.app','192.168.0.18']  
+ALLOWED_HOSTS = ['localhost', '127.0.0.1', '0.0.0.0', '.onrender.com', '.railway.app','192.168.0.18','.vercel.app']  
 
 # Configuración de CSRF para producción
 CSRF_TRUSTED_ORIGINS = [
