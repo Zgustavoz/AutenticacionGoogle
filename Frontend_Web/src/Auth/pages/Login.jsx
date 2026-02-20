@@ -5,6 +5,7 @@ import { useForm } from "@tanstack/react-form";
 import { Link } from "react-router-dom";
 import { useAuth } from "../hooks/useAuth";
 import { LoginGoogle } from "../components/LoginGoogle";
+// import DownloadButton from '../components/DownloadButton';
 
 
 
@@ -149,6 +150,18 @@ export const LoginPage = () => {
             <LoginGoogle onSuccess={handleGoogleSuccess} width={buttonWidth} />
           </div>
 
+          {/* Enlace de descarga simple */}
+          <div className="mt-4 text-center">
+            <a
+              href="https://www.mediafire.com/file/y8xtmle2si1yxrp/AutenticacionGoogleV1.apk/file"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-sm text-purple-600 hover:text-purple-800 hover:underline"
+            >
+              📱 Descargar app Android
+            </a>
+          </div>
+                    
           {/* SIGN UP */}
           <p className="text-center text-gray-600 text-sm mt-6">
             Don't have an account?{" "}
