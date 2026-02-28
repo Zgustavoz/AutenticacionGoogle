@@ -1,4 +1,4 @@
-// auth/components/LoginGoogle.jsx
+// src/auth/components/LoginGoogle.jsx
 import { GoogleLogin } from '@react-oauth/google';
 import toast from 'react-hot-toast';
 
