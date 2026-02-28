@@ -1,4 +1,4 @@
-// src/Auth/context/AuthContext.jsx
+// src/auth/context/AuthContext.jsx
 import { createContext, useContext, useState, useEffect } from "react";
 import { obtenerPerfil } from "../../api/auth/authApi";
 import { mapaPermisos } from "../../components/utils/Permisos";

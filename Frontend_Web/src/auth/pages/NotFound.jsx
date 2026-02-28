@@ -1,4 +1,4 @@
-// src/Auth/pages/NotFound.jsx
+// src/auth/pages/NotFound.jsx
 import { useNavigate } from 'react-router-dom';
 
 function NotFound() {

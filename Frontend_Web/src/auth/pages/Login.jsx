@@ -1,4 +1,4 @@
-// src/Auth/pages/Login.jsx
+// src/auth/pages/Login.jsx
 import { Eye, EyeOff } from "lucide-react";
 import { useRef, useState, useEffect } from "react";
 import { useForm } from "@tanstack/react-form";
