@@ -24,4 +24,4 @@ COPY . .
 EXPOSE $PORT
 
 # Comando para ejecutar la aplicación con Gunicorn
-CMD gunicorn Backend.wsgi:application --bind 0.0.0.0:$PORT
+CMD ["sh", "-c", "gunicorn Backend.wsgi:application --bind 0.0.0.0:${PORT:-8000}"]
