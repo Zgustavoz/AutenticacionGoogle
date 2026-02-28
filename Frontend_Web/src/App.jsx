@@ -5,7 +5,7 @@ import ProtectedRoute from './auth/components/ProtectedRoute';
 import Login from './auth/pages/Login';
 import Registro from './auth/pages/Registro';
 import RecuperarPassword from './auth/pages/RecuperarPassword';
-import RestablecerPassword from './Auth/pages/RestablecerPassword';
+import RestablecerPassword from './auth/pages/RestablecerPassword';
 import { DashboardLayout } from './dashBoard/DashBoard';
 import ClienteDashboard from './cliente/clientePage';
 import Unauthorized from "./auth/pages/Unauthorized";
