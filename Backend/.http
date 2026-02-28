@@ -1,5 +1,5 @@
 ### Login JWT
-POST http://127.0.0.1:8000/api/token/
+POST http://127.0.0.1:8000/usuarios/token/
 Content-Type: application/json
 
 {
@@ -40,3 +40,21 @@ Content-Type: application/json
 
 ###
 GET http://127.0.0.1:8000/api/password-reset/
+
+### Login con cookies
+POST http://127.0.0.1:8000/usuarios/token/
+Content-Type: application/json
+
+{
+  "username": "admin1",
+  "password": "123456789#"
+}
+
+### Endpoint protegido (con cookie)
+GET http://127.0.0.1:8000/usuarios/usuarios/
+
+### Refresh token (con cookie)
+POST http://127.0.0.1:8000/usuarios/token/refresh/
+
+### Logout
+POST http://127.0.0.1:8000/usuarios/logout/

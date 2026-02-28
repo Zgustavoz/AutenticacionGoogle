@@ -1,16 +1,18 @@
 // src/cliente/clientePage.jsx
-import { useAuth } from '../context/AuthContext';
+import { useAuth } from '../Auth/hooks/useAuth';
+import { useAuth as useAuthContext } from '../Auth/context/AuthContext';
 import { useNavigate } from 'react-router-dom'; 
 
 function ClienteDashboard() {
-  const { user, logout } = useAuth();
+  const { logout } = useAuth();
+  const { user } = useAuthContext();
   const navigate = useNavigate(); 
 
   const handleLogout = async () => {
     await logout();
     navigate('/login');
   };
-
+ 
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-green-500 to-teal-600">

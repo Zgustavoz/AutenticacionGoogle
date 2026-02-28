@@ -1,5 +1,4 @@
-// src/Auth/hooks/useAuth.jsx
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
 import toast from 'react-hot-toast';
 import {
@@ -10,77 +9,45 @@ import {
   loginConGoogle,
   obtenerPerfil,
   cambiarPassword,
-} from '../../Api/auth/authApi';
-import { useAuth as useAuthContext } from '../../context/AuthContext';
-// import { use } from 'react';
+  cerrarSesion,
+} from '../../api/auth/authApi';
+import { useAuth as useAuthContext } from '../context/AuthContext';
 
 export const useAuth = () => {
   const queryClient = useQueryClient();
   const navigate = useNavigate();
-  const { login: contextLogin, loginWithGoogle: contextGoogleLogin, logout: contextLogout } = useAuthContext();
+  const { login: contextLogin, logout: contextLogout } = useAuthContext();
 
   // 📌 INICIAR SESIÓN
   const login = useMutation({
-    mutationFn: (credentials) => iniciarSesion(credentials),
-    onSuccess: (data) => {
-      // Guardar tokens
-      localStorage.setItem('access_token', data.access);
-      localStorage.setItem('refresh_token', data.refresh);
-      
-      // Decodificar token para obtener datos del usuario
-      const payload = JSON.parse(atob(data.access.split('.')[1]));
-      const userData = {
-        id: payload.user_id,
-        username: payload.username,
-        email: payload.email,
-        rol: payload.rol,
-        es_admin: payload.es_admin
-      };
-      
-      console.log('Usuario autenticado:', userData);
-      
-      // Actualizar el contexto
-      contextLogin(userData);
-      
+    mutationFn: iniciarSesion,
+    onSuccess: async () => {
+      const perfil = await obtenerPerfil();
+      contextLogin(perfil);
       toast.success('¡Inicio de sesión exitoso!');
-      
-      // 👇 CAMBIO: Navegar DESPUÉS de actualizar el contexto
-      if (userData.es_admin) {
-        console.log('Redirigiendo a /admin');
-        navigate('/admin');
-      } else {
-        console.log('Redirigiendo a /cliente');
-        navigate('/cliente');
-      }
+      const esEmpleado = perfil.es_admin || perfil.roles_info?.some(r => r.nombre === 'empleado');
+      navigate(esEmpleado ? '/dashboard' : '/cliente');
     },
     onError: (error) => {
-      const errorMsg = error.error || error.detail || 'Error al iniciar sesión';
+      const errorMsg = error?.response?.data?.detail || error?.detail || 'Error al iniciar sesión';
+      toast.error(errorMsg);
+    },
+  });
+
+  // 📝 REGISTRAR USUARIO
+  const registro = useMutation({
+    mutationFn: (userData) => registrarUsuario(userData),
+    onSuccess: (data) => {
+      toast.success(data.message || '¡Usuario registrado exitosamente!');
+      setTimeout(() => navigate('/login'), 2000);
+    },
+    onError: (error) => {
+      const errorMsg = error.error || error.message || 'Error al registrar usuario';
       toast.error(errorMsg);
     }
   });
 
-// 📝 REGISTRAR USUARIO
-const registro = useMutation({
-  mutationFn: (userData) => {
-    console.log('📤 Intentando registrar usuario con datos:', userData);
-    return registrarUsuario(userData);
-  },
-  onSuccess: (data) => {
-    console.log('✅ Registro exitoso:', data);
-    toast.success(data.message || '¡Usuario registrado exitosamente!');
-    setTimeout(() => navigate('/login'), 2000);
-  },
-  onError: (error) => {
-    console.error('❌ Error en registro:', error);
-    console.error('❌ Detalles del error:', error);
-    console.error('❌ Error completo:', JSON.stringify(error, null, 2));
-    
-    const errorMsg = error.error || error.message || 'Error al registrar usuario';
-    toast.error(errorMsg);
-  }
-});
-
-  // 📧 SOLICITAR RECUPERACIÓN DE CONTRASEÑA
+  // 📧 SOLICITAR RECUPERACIÓN
   const recuperarPassword = useMutation({
     mutationFn: ({ email }) => solicitarRecuperacion(email),
     onSuccess: (data) => {
@@ -107,40 +74,18 @@ const registro = useMutation({
 
   // 🟢 LOGIN CON GOOGLE
   const googleLogin = useMutation({
-    mutationFn: (token) => loginConGoogle(token),
-    onSuccess: (data) => {
-      // Guardar tokens
-      localStorage.setItem('access_token', data.access);
-      localStorage.setItem('refresh_token', data.refresh);
-      
-      console.log('Usuario de Google:', data.user);
-      
-      // Actualizar el contexto
-      contextGoogleLogin(data.user);
-      
-      toast.success('¡Inicio de sesión con Google exitoso!');
-      
-      // Redirigir según rol
-      if (data.user.es_admin) {
-        console.log('Redirigiendo a /admin');
-        navigate('/admin');
-      } else {
-        console.log('Redirigiendo a /cliente');
-        navigate('/cliente');
-      }
+    mutationFn: loginConGoogle,
+    onSuccess: async () => {
+      const perfil = await obtenerPerfil();
+      contextLogin(perfil);
+      toast.success('¡Inicio de sesión exitoso!');
+      const esEmpleado = perfil.es_admin || perfil.roles_info?.some(r => r.nombre === 'empleado');
+      navigate(esEmpleado ? '/dashboard' : '/cliente');
     },
     onError: (error) => {
-      const errorMsg = error.error || error.message || 'Error al iniciar sesión con Google';
+      const errorMsg = error?.error || error?.message || 'Error al iniciar sesión con Google';
       toast.error(errorMsg);
-    }
-  });
-
-  // 👤 OBTENER PERFIL
-  const perfil = useQuery({
-    queryKey: ['perfil'],
-    queryFn: obtenerPerfil,
-    enabled: !!localStorage.getItem('access_token'),
-    retry: false,
+    },
   });
 
   // 🔐 CAMBIAR CONTRASEÑA
@@ -156,10 +101,16 @@ const registro = useMutation({
   });
 
   // 🚪 CERRAR SESIÓN
-  const logout = () => {
+  const logout = async () => {
+    try {
+      await cerrarSesion(); // borra cookies en el backend
+    } catch (error) {
+      console.error('Error al cerrar sesión:', error);
+    }
     contextLogout();
     queryClient.clear();
     toast.success('Sesión cerrada');
+    navigate('/login');
   };
 
   return {
@@ -168,7 +119,6 @@ const registro = useMutation({
     recuperarPassword,
     restablecer,
     googleLogin,
-    perfil,
     cambiarClave,
     logout
   };

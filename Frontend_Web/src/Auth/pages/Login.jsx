@@ -5,8 +5,6 @@ import { useForm } from "@tanstack/react-form";
 import { Link } from "react-router-dom";
 import { useAuth } from "../hooks/useAuth";
 import { LoginGoogle } from "../components/LoginGoogle";
-// import DownloadButton from '../components/DownloadButton';
-
 
 
 export const LoginPage = () => {

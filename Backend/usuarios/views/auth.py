@@ -1,4 +1,4 @@
-# usuarios/views.py
+# Backend/usuarios/views/auth.py
 from rest_framework import generics, status
 from rest_framework.response import Response
 from rest_framework.permissions import AllowAny, IsAuthenticated
@@ -9,17 +9,17 @@ from django.core.mail import send_mail
 from django.conf import settings
 from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
 from django.utils.encoding import force_bytes
-from rest_framework_simplejwt.tokens import RefreshToken
 from google.oauth2 import id_token
 from google.auth.transport import requests as google_requests
-from .models import Usuario, Rol
 from decouple import config
-# from django.core.mail import get_connection
 import traceback
 import threading
-from .serializers import (
+from .auth_cookies import set_auth_cookies
+
+from ..serializers.usuario import UsuarioSerializer
+from ..models import Usuario, Rol
+from ..serializers import (
     CustomTokenObtainPairSerializer,
-    UsuarioSerializer,
     RegistroSerializer,
 )
 
@@ -37,9 +37,14 @@ class RegistroView(generics.CreateAPIView):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         user = serializer.save()
-        
         return Response({
-            "user": UsuarioSerializer(user).data,
+            "user": {
+                "id": user.id,
+                "username": user.username,
+                "email": user.email,
+                "first_name": user.first_name,
+                "last_name": user.last_name
+            },
             "message": "Usuario creado exitosamente. Ahora puedes iniciar sesión."
         }, status=status.HTTP_201_CREATED)
 
@@ -53,10 +58,6 @@ class PerfilUsuarioView(generics.RetrieveUpdateAPIView):
 
 
 class RestablecerPasswordView(APIView):
-    """
-    Vista para restablecer contraseña usando uid y token en la URL
-    Endpoint: /api/restablecer-password/<uidb64>/<token>/
-    """
     permission_classes = [AllowAny]
     
     def post(self, request, uidb64, token):
@@ -104,28 +105,24 @@ class PasswordResetView(APIView):
         
         def send_reset_email(user, email):
             try:
-                
                 token = default_token_generator.make_token(user)
                 uid = urlsafe_base64_encode(force_bytes(user.pk))
                 reset_url = f"{config('FRONTEND_URL')}/reset-password/{uid}/{token}/"
-                
-                result = send_mail(
+                send_mail(
                     'Recuperación de Contraseña',
                     f'Enlace: {reset_url}',
                     config('EMAIL_HOST_USER'),
                     [email],
                     fail_silently=False,
                 )
-                
             except Exception as e:
                 traceback.print_exc()
         
         try:
             user = Usuario.objects.get(email=email)
-            
             email_thread = threading.Thread(target=send_reset_email, args=(user, email))
             email_thread.daemon = False
-            email_thread.start()        
+            email_thread.start()
             return Response({'message': 'Email enviado'}, status=200)
             
         except Usuario.DoesNotExist:
@@ -135,44 +132,40 @@ class PasswordResetView(APIView):
             traceback.print_exc()
             return Response({'error': 'Error interno'}, status=500)
 
+
 class GoogleLoginView(APIView):
-    """
-    Vista para autenticación con Google
-    Endpoint: /api/auth/google/
-    """
     permission_classes = [AllowAny]
-    
+
     def post(self, request):
         try:
             token = request.data.get('token')
-            
             if not token:
-                return Response({
-                    'error': 'Token no proporcionado'
-                }, status=status.HTTP_400_BAD_REQUEST)
-            
-            # Verificar el token con Google
+                return Response(
+                    {'error': 'Token no proporcionado'},
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+
             try:
                 idinfo = id_token.verify_oauth2_token(
                     token,
                     google_requests.Request(),
                     settings.SOCIALACCOUNT_PROVIDERS['google']['APP']['client_id']
                 )
-                
+
                 if idinfo['iss'] not in ['accounts.google.com', 'https://accounts.google.com']:
                     raise ValueError('Wrong issuer.')
-                
+
                 email = idinfo['email']
                 first_name = idinfo.get('given_name', '')
                 last_name = idinfo.get('family_name', '')
                 google_id = idinfo['sub']
-                
-            except ValueError as e:
-                return Response({
-                    'error': 'Token de Google inválido'
-                }, status=status.HTTP_400_BAD_REQUEST)
-            
-            # Buscar o crear el usuario
+
+            except ValueError:
+                return Response(
+                    {'error': 'Token de Google inválido'},
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+
             user, created = Usuario.objects.get_or_create(
                 email=email,
                 defaults={
@@ -181,44 +174,32 @@ class GoogleLoginView(APIView):
                     'last_name': last_name,
                 }
             )
-            
-            # Si es nuevo usuario, asignar rol de cliente
+
             if created:
                 try:
                     rol_cliente = Rol.objects.get(nombre='cliente')
-                    user.rol = rol_cliente
-                    user.save()
                 except Rol.DoesNotExist:
                     rol_cliente = Rol.objects.create(
                         nombre='cliente',
                         descripcion='Rol de cliente por defecto'
                     )
-                    user.rol = rol_cliente
-                    user.save()
-            
-            # Generar tokens JWT
-            refresh = RefreshToken.for_user(user)
-            
-            refresh['username'] = user.username
-            refresh['email'] = user.email
-            refresh['rol'] = user.rol.nombre if user.rol else 'cliente'
-            refresh['es_admin'] = user.rol.es_admin if user.rol and hasattr(user.rol, 'es_admin') else False
-            
-            return Response({
-                'access': str(refresh.access_token),
-                'refresh': str(refresh),
-                'user': {
-                    'id': user.id,
-                    'username': user.username,
-                    'email': user.email,
-                    'first_name': user.first_name,
-                    'last_name': user.last_name,
-                    'rol': user.rol.nombre if user.rol else 'cliente',
-                    'es_admin': user.rol.es_admin if user.rol and hasattr(user.rol, 'es_admin') else False,
-                }
-            }, status=status.HTTP_200_OK)
-            
+                user.roles.add(rol_cliente)
+                user.save()
+
+            # ✅ CAMBIADO: usar cookies en vez de devolver tokens en body
+            refresh = CustomTokenObtainPairSerializer.get_token(user)
+            access_token = str(refresh.access_token)
+            refresh_token = str(refresh)
+
+            response = Response(
+                {'message': 'Login con Google exitoso'},
+                status=status.HTTP_200_OK
+            )
+            set_auth_cookies(response, access_token, refresh_token)
+            return response
+
         except Exception as e:
-            return Response({
-                'error': f'Error en el servidor: {str(e)}'
-            }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+            return Response(
+                {'error': f'Error en el servidor: {str(e)}'},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
