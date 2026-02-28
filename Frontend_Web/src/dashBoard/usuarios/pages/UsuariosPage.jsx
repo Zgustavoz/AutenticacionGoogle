@@ -4,7 +4,7 @@ import { UsuariosTable } from '../components/UsuariosTable';
 import { EditarUsuarioModal } from '../components/EditarUsuarioModal';
 import { CrearUsuarioModal } from '../components/CrearUsuarioModal';
 import { useUsuario } from '../hooks/useUsuario';
-import { useAuth } from '../../../Auth/context/AuthContext';
+import { useAuth } from '../../../auth/context/AuthContext';
 import toast from 'react-hot-toast';
 
 export const UsuariosPage = () => {

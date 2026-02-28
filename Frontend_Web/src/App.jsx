@@ -1,15 +1,15 @@
 //src/App.jsx
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
-import { AuthProvider } from './Auth/context/AuthContext';
-import ProtectedRoute from './Auth/components/ProtectedRoute';
-import Login from './Auth/pages/Login';
-import Registro from './Auth/pages/Registro';
-import RecuperarPassword from './Auth/pages/RecuperarPassword';
+import { AuthProvider } from './auth/context/AuthContext';
+import ProtectedRoute from './auth/components/ProtectedRoute';
+import Login from './auth/pages/Login';
+import Registro from './auth/pages/Registro';
+import RecuperarPassword from './auth/pages/RecuperarPassword';
 import RestablecerPassword from './Auth/pages/RestablecerPassword';
 import { DashboardLayout } from './dashBoard/DashBoard';
 import ClienteDashboard from './cliente/clientePage';
-import Unauthorized from "./Auth/pages/Unauthorized";
-import NotFound from "./Auth/pages/NotFound";
+import Unauthorized from "./auth/pages/Unauthorized";
+import NotFound from "./auth/pages/NotFound";
 
 import { RolesPage } from './dashBoard/roles/pages/RolesPage';
 import { UsuariosPage } from './dashBoard/usuarios/pages/UsuariosPage';

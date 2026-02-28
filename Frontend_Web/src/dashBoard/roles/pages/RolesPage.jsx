@@ -4,8 +4,8 @@ import { CreateButton } from '../../../components/ui/buttons';
 import { RolesTable } from '../components/RolesTable';
 import { useRol } from '../hooks/useRol';
 import toast from 'react-hot-toast';
-import Unauthorized from '../../../Auth/pages/Unauthorized';
-import { useAuth } from '../../../Auth/context/AuthContext';
+import Unauthorized from '../../../auth/pages/Unauthorized';
+import { useAuth } from '../../../auth/context/AuthContext';
 
 export const RolesPage = () => {
 

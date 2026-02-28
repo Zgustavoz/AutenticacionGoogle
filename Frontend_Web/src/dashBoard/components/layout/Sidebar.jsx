@@ -13,8 +13,8 @@ import {
 } from "lucide-react";
 import { AnimatePresence, motion } from "motion/react";
 import { useState, useEffect } from "react";
-import { useAuth } from '../../../Auth/context/AuthContext';
-import { useAuth as useAuthHook } from '../../../Auth/hooks/useAuth';
+import { useAuth } from '../../../auth/context/AuthContext';
+import { useAuth as useAuthHook } from '../../../auth/hooks/useAuth';
 import { useNavigate } from 'react-router-dom';
 
 export const Sidebar = () => {

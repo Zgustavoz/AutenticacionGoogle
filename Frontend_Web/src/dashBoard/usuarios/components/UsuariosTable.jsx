@@ -1,6 +1,6 @@
 // src/dashBoard/usuarios/components/UsuariosTable.jsx
 import { User, Mail, Phone, Calendar, Eye, EyeOff } from 'lucide-react';
-import { useAuth } from '../../../Auth/context/AuthContext';
+import { useAuth } from '../../../auth/context/AuthContext';
 
 export const UsuariosTable = ({ usuarios, onToggleActive, onEditar }) => {
   const { tienePermiso } = useAuth();

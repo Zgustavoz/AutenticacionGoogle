@@ -1,6 +1,6 @@
 // src/cliente/clientePage.jsx
-import { useAuth } from '../Auth/hooks/useAuth';
-import { useAuth as useAuthContext } from '../Auth/context/AuthContext';
+import { useAuth } from '../auth/hooks/useAuth';
+import { useAuth as useAuthContext } from '../auth/context/AuthContext';
 import { useNavigate } from 'react-router-dom'; 
 
 function ClienteDashboard() {
