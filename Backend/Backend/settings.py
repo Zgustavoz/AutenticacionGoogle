@@ -145,9 +145,9 @@ SIMPLE_JWT = {
     'AUTH_HEADER_TYPES': ('Bearer',),
     'AUTH_COOKIE': 'access_token',
     'AUTH_COOKIE_REFRESH': 'refresh_token',
-    'AUTH_COOKIE_SECURE': False,      # True en producción (requiere HTTPS)
+    'AUTH_COOKIE_SECURE': True,      # True en producción (requiere HTTPS)
     'AUTH_COOKIE_HTTP_ONLY': True,
-    'AUTH_COOKIE_SAMESITE': 'Lax',  # 'Lax' o 'Strict' en producción
+    'AUTH_COOKIE_SAMESITE': 'None',  # 'Lax' o 'Strict' en producción
 }
 
 AUTH_USER_MODEL = 'usuarios.Usuario'
