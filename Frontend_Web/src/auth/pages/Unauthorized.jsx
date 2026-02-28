@@ -1,4 +1,4 @@
-// src/Auth/pages/Unauthorized.jsx
+// src/auth/pages/Unauthorized.jsx
 import { Shield } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
